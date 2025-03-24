@@ -10,114 +10,16 @@ library(snow)     # (if you want to use multicore functionality; some systems/R 
 library(parallel)
 library(BioGeoBEARS)
 
-########################################################
-# TO GET THE OPTIMX/OPTIM FIX, AND THE UPPASS FIX, 
-# SOURCE THE REVISED FUNCTIONS WITH THESE COMMANDS
-#
-# CRUCIAL CRUCIAL CRUCIAL: 
-# YOU HAVE TO RUN THE SOURCE COMMANDS AFTER 
-# *EVERY TIME* YOU DO library(BioGeoBEARS). THE CHANGES ARE NOT "PERMANENT", 
-# THEY HAVE TO BE MADE EACH TIME.  IF YOU ARE GOING TO BE OFFLINE, 
-# YOU CAN DOWNLOAD EACH .R FILE TO YOUR HARD DRIVE AND REFER THE source()
-# COMMANDS TO THE FULL PATH AND FILENAME OF EACH FILE ON YOUR
-# LOCAL SYSTEM INSTEAD.
-########################################################
 library(BioGeoBEARS)
-source("http://phylo.wdfiles.com/local--files/biogeobears/cladoRcpp.R") # (needed now that traits model added; source FIRST!)
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_add_fossils_randomly_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_basics_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_calc_transition_matrices_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_classes_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_detection_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_DNA_cladogenesis_sim_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_extract_Qmat_COOmat_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_generics_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_models_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_on_multiple_trees_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_plots_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_readwrite_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_simulate_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_SSEsim_makePlots_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_SSEsim_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_stochastic_mapping_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_stratified_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_univ_model_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/calc_uppass_probs_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/calc_loglike_sp_v01.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/get_stratified_subbranch_top_downpass_likelihoods_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/runBSM_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/stochastic_map_given_inputs.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/summarize_BSM_tables_v1.R")
-source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_traits_v1.R") # added traits model
+
 calc_loglike_sp = compiler::cmpfun(calc_loglike_sp_prebyte)    # crucial to fix bug in uppass calculations
 calc_independent_likelihoods_on_each_branch = compiler::cmpfun(calc_independent_likelihoods_on_each_branch_prebyte)
 # slight speedup hopefully
 
-#######################################################
-# Local source()-ing method -- uses BioGeoBEARS sourceall() function 
-# on a directory of .R files, so you don't have to type them out.
-# The directories here are on my machine, you would have to make a 
-# directory, save the .R files there, and refer to them.
-#
-# NOTE: it's best to source the "cladoRcpp.R" update first, to avoid warnings like this:
-##
-## Note: possible error in 'rcpp_calc_anclikes_sp_COOweights_faster(Rcpp_leftprobs = tmpca_1, ': 
-##         unused arguments (m = m, m_null_range = include_null_range, jts_matrix = jts_matrix) 
-##
-#
-# TO USE: Delete or comment out the 'source("http://...")' commands above, and un-comment
-#              the below...
-########################################################################
-# Un-comment (and fix directory paths) to use:
-#library(BioGeoBEARS)
-#source("/drives/Dropbox/_njm/__packages/cladoRcpp_setup/cladoRcpp.R")
-#sourceall("/drives/Dropbox/_njm/__packages/BioGeoBEARS_setup/")
-#calc_loglike_sp = compiler::cmpfun(calc_loglike_sp_prebyte)    # crucial to fix bug in uppass calculations
-#calc_independent_likelihoods_on_each_branch = compiler::cmpfun(calc_independent_likelihoods_on_each_branch_prebyte)
-########################################################################
+# SET WORKING DIRECTORY TO BASE-LEVEL OF GITHUB REPOSITORY -- MODIFY BELOW TO THE CORRECT PATH
+# setwd("~/Dropbox/z_my_stuff/ryan")
 
-#######################################################
-# SETUP: YOUR WORKING DIRECTORY
-#######################################################
-# You will need to set your working directory to match your local system
-
-# Note these very handy functions!
-# Command "setwd(x)" sets your working directory
-# Command "getwd()" gets your working directory and tells you what it is.
-# Command "list.files()" lists the files in your working directory
-# To get help on any command, use "?".  E.g., "?list.files"
-
-# Set your working directory for output files
-# default here is your home directory ("~")
-# Change this as you like
-#wd = np("~")
-#setwd(wd)
-
-# Double-check your working directory with getwd()
-#getwd()
-
-#######################################################
-# SETUP: YOUR TREE FILE AND GEOGRAPHY FILE
-
-#######################################################
-# Phylogeny file
-# Notes: 
-# 1. Must be binary/bifurcating: no polytomies
-# 2. No negative branchlengths (e.g. BEAST MCC consensus trees sometimes have negative branchlengths)
-# 3. Be careful of very short branches, as BioGeoBEARS will interpret ultrashort branches as direct ancestors
-# 4. You can use non-ultrametric trees, but BioGeoBEARS will interpret any tips significantly below the 
-#    top of the tree as fossils!  This is only a good idea if you actually do have fossils in your tree,
-#    as in e.g. Wood, Matzke et al. (2013), Systematic Biology.
-# 5. The default settings of BioGeoBEARS make sense for trees where the branchlengths are in units of 
-#    millions of years, and the tree is 1-1000 units tall. If you have a tree with a total height of
-#    e.g. 0.00001, you will need to adjust e.g. the max values of d and e, or (simpler) multiply all
-#    your branchlengths to get them into reasonable units.
-# 6. DON'T USE SPACES IN SPECIES NAMES, USE E.G. "_"
-#######################################################
-# This is the example Newick file for Hawaiian Saxifragales
-# (from Ree & Smith 2008)
-# "trfn" = "tree file name"
-setwd("~/Dropbox/z_my_stuff/ryan")
+# Set tree path string
 trfn = "ultrametric_occur_matched.subsample.tre"
 
 # Look at the raw Newick file:
